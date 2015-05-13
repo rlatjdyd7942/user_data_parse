@@ -231,7 +231,7 @@ namespace user_data_parse
         private int getDaysFromId(int id)
         {
             int index = userIdData.Length;
-            for (int i = 0; i < userIdData.Length - 2; ++i)
+            for (int i = 0; i < userIdData.Length - 1; ++i)
             {
                 if (id < userIdData[i + 1])
                 {

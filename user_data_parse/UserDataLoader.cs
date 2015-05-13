@@ -69,7 +69,7 @@ namespace user_data_parse
                     dateTimeTick = DateTime.ParseExact(parts[0], "yyyy-MM-dd", null).Ticks;
                     age = int.Parse(parts[1]);
                     gender = int.Parse(parts[2]);
-                    marriage = int.Parse(parts[3]);
+                    //marriage = int.Parse(parts[3]);
                     count = int.Parse(parts[4]);
                 }
             }
