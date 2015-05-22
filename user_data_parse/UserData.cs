@@ -22,6 +22,11 @@ namespace user_data_parse
             this.count = count;
         }
 
+        public DateTime getDate()
+        {
+            return new DateTime(dateTimeTick);
+        }
+
         int IComparable.CompareTo(object obj)
         {
             int result = 0;

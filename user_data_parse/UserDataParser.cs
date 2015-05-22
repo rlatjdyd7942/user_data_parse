@@ -54,24 +54,24 @@ namespace user_data_parse
 
         public void run(String folderPath, String resultFilePath)
         {
-            List<int[]> resultList = new List<int[]>();
+            List<int[]> retensionList = new List<int[]>();
             List<int[]> userCountList = new List<int[]>();
             DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", null);
             for (DateTime current = DateTime.ParseExact(startDate, "yyyy-MM-dd", null)
                 ; (endDateTime - current).Days >= 0
                 ; current = current.AddDays(1))
             {
-                resultList.Add( calculateRetensionByDate(current, folderPath) );
+                retensionList.Add( calculateRetensionByDate(current, folderPath) );
                 userCountList.Add( getUserCountByDate(current, folderPath) );
             }
-            List<string> resultString = getResultStringList(resultList, userCountList);
+            List<string> resultString = getResultStringList(retensionList, userCountList);
             writeResults(resultFilePath, resultString);
         }
 
-        private List<string> getResultStringList(List<int[]> resultList, List<int[]> userCountList)
+        private List<string> getResultStringList(List<int[]> retensionList, List<int[]> userCountList)
         {
-            int columns = resultList.Count;
-            int rows = resultList[0].Length;
+            int columns = retensionList.Count;
+            int rows = retensionList[0].Length;
             List<string> resultString = new List<string>();
             try
             {
@@ -89,7 +89,7 @@ namespace user_data_parse
                     line = "\"" + terms[i] + "\"";
                     for (int j = 0; j < columns; ++j)
                     {
-                        line += ",\"" + resultList[j][i] + "\"";
+                        line += ",\"" + retensionList[j][i] + "\"";
                         line += ",\"" + userCountList[j][i] + "\"";
                     }
                     resultString.Add(line);
@@ -97,7 +97,7 @@ namespace user_data_parse
                 line = "\"" + terms[terms.Length - 1] + "~\"";
                 for (int i = 0; i < columns; ++i)
                 {
-                    line += ",\"" + resultList[i][rows - 1] + "\"";
+                    line += ",\"" + retensionList[i][rows - 1] + "\"";
                     line += ",\"" + userCountList[i][rows - 1] + "\"";
                 }
                 resultString.Add(line);
@@ -140,13 +140,25 @@ namespace user_data_parse
                 int days = 1 + getDaysFromDate( dateTime.ToString("yyyy-MM-dd") );
                 cur = userIdData[days];
                 DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", null);
-                for (int i = 0; i < terms.Length; ++i)
+                for (int i = 0; i < userData.Count; ++i)
+                {
+                    if (this.gender != 0 && userData[i].gender != this.gender)
+                        continue;
+                    if (userData[i].age < startAge || userData[i].age > endAge)
+                        continue;
+                    DateTime date = userData[i].getDate();
+                    if (date > dateTime)
+                        continue;
+                    int index = getTermsIndexFromDays( dateTime, 1 + getDaysFromDate(date.ToString("yyyy-MM-dd")) );
+                    result[index] += userData[i].count;
+                }
+                /*for (int i = 0; i < terms.Length; ++i)
                 {
                     prev = userIdData[days - terms[i]];
                     result[i] = cur - prev;
                     cur = prev;
                 }
-                result[terms.Length] = cur;
+                result[terms.Length] = cur;*/
             }
             catch (Exception e)
             {
@@ -184,11 +196,8 @@ namespace user_data_parse
                         //marriage = Int32.Parse(splited[3]);
                         if (startAge > age || age > endAge)
                             continue;
-                        if (this.gender != 0)
-                        {
-                            if (this.gender != gender)
-                                continue;
-                        }
+                        if (this.gender != 0 && this.gender != gender)
+                            continue;
                         //if (marriage) {}
                         days = getDaysFromId(id);
                         index = getTermsIndexFromDays(dateTime, days);
